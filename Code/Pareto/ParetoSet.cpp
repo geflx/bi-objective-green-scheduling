@@ -1,3 +1,8 @@
+/**
+ *	@author Gabriel Felix
+ * 	@date	11/30/20
+ */
+
 #include <iostream>
 #include <fstream>
 #include "ParetoSet.h"

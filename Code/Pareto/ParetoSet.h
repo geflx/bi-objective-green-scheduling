@@ -1,11 +1,14 @@
+/**
+ *	@author Gabriel Felix
+ * 	@date	11/30/20
+ */
+
 #include <set>
 #include <map>
 #include "Solution.h"
 
 #ifndef PARETOSET_H
 #define PARETOSET_H
-
-// @author: Gabriel Felix (geflx)
 
 class ParetoSet{
 
