@@ -14,21 +14,22 @@ int main(){
 		ifstream procTime("Data_p" + to_string(i) + ".txt");
 		ifstream macPrice("Data_e" + to_string(i) + ".txt");
 
-		int K = 0, N = 0, M = 0, tmp;
+		int K = 0, N = 0, M = 0;
+		double tmp;
 		vector<int> T, J, H;
 
 		while(timeSlot >> tmp){
-			T.push_back(tmp);
+			T.push_back((int)tmp);
 			K++;
 		}
 
 		while(procTime >> tmp){
-			J.push_back(tmp);
+			J.push_back((int)tmp);
 			N++;
 		}
 
 		while(macPrice >> tmp){
-			H.push_back(tmp);
+			H.push_back((int)tmp);
 			M++;
 		}
 
