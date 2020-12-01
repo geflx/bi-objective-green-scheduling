@@ -23,7 +23,7 @@ public:
 	void setObj(int x, int y);
 	std::pair<int, int> getObj(){ return obj; }
 
-	void setV(int v, int x, int y){ setup[x][y] = v; };
+	void setV(int job, int machine, int position);
 	int getV(int x, int y){ return setup[x][y]; }
 };
 

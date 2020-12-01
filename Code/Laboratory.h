@@ -6,10 +6,10 @@
 #include <vector>
 #include "ParetoSet.h"
 
-#ifndef LAB_H
-#define LAB_H
+#ifndef LABORATORY_H
+#define LABORATORY_H
 
-class Lab{
+class Laboratory{
 
 private:
 	int K, N, M;
@@ -17,7 +17,7 @@ private:
 	ParetoSet solutions;
 
 public:
-	Lab(const char *fileDir);
+	Laboratory(const char *fileDir);
 
 	void constructiveHeuristic();
 	void printSolutions();

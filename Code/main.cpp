@@ -4,7 +4,7 @@
  */
 
 #include "ParetoSet.h"
-#include "Lab.h"
+#include "Laboratory.h"
 #include <iostream>
 #include <fstream>
 #include <algorithm> 
@@ -13,6 +13,11 @@
 using namespace std;
 
 int main(){
-	Lab env("RData_1.txt");
+
+	Laboratory env("RData_77.txt");
+
+	env.constructiveHeuristic();
+	
+	env.printSolutions();
 }
 

@@ -16,3 +16,8 @@ void Solution::setObj(int x, int y){
 	obj.first = x;
 	obj.second = y;
 }
+
+void Solution::setV(int job, int machine, int position){
+	setup[0][job] = machine;
+	setup[1][job] = position;
+}
