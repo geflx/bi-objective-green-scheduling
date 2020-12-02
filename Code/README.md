@@ -21,7 +21,10 @@ for each Makespan from MAX to MIN:
 
 # Class Diagram
 
-Insert photo.png here
+<p align="center">
+<img src="../Assets/class_diagram_02_12_20.png" width=700 height=390>
+</p>
+
 
 # Pareto
 
