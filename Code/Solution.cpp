@@ -4,6 +4,7 @@
  */
 
 #include "Solution.h"
+#include <iostream>
 
 using namespace std;
 
@@ -20,4 +21,21 @@ void Solution::setObj(int x, int y){
 void Solution::setV(int job, int machine, int position){
 	setup[0][job] = machine;
 	setup[1][job] = position;
+}
+
+void Solution::printSolution(){
+
+	printf("[");
+
+	for(int i = 0; i < N; i++)
+		if(i != (N - 1))
+			printf("%d, ", setup[0][i]);
+		else
+			printf("%d] [", setup[0][i]);
+
+	for(int i = 0; i < N; i++)
+		if(i != (N - 1))
+			printf("%d, ", setup[1][i]);
+		else
+			printf("%d]\n", setup[1][i]);
 }

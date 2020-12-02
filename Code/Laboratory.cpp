@@ -7,6 +7,7 @@
 #include <fstream>
 #include <limits>
 #include <algorithm>
+#include <omp.h>
 
 using namespace std;
 
@@ -43,6 +44,44 @@ Laboratory::Laboratory(const char *fileDir){
 void Laboratory::printSolutions(){
 	solutions.printSet();
 }
+
+struct FenwickTree {
+    vector<int> bit;  // binary indexed tree
+    int n;
+
+    // Op2: initializing with an empty array
+    FenwickTree(int n) {
+        this->n = n + 1;
+        bit.assign(n + 1, 0);
+    }
+
+    // Op2: initializing with existing array
+    FenwickTree(vector<int> a)
+        : FenwickTree(a.size()) {
+        for (size_t i = 0; i < a.size(); i++)
+            add(i, a[i]);
+    }
+
+    void add(int idx, int delta) {
+        for (++idx; idx < n; idx += idx & -idx)
+            bit[idx] += delta;
+    }
+
+    // Attention: don't mix both!! Choose one!
+
+	// 1 - Point Update and Range Query
+
+    int sum(int idx) {
+        int ret = 0;
+        for (++idx; idx > 0; idx -= idx & -idx)
+            ret += bit[idx];
+        return ret;
+    }
+
+    int sum(int l, int r) {
+        return sum(r) - sum(l - 1);
+    }
+};
 
 // Reviews: 0
 void Laboratory::constructiveHeuristic(){
@@ -81,6 +120,8 @@ void Laboratory::constructiveHeuristic(){
 		 */
 		vector<vector<pair<int, int>>> occupiedSlots (M);
 
+		// vector<FenwickTree> occupiedSlots(M, FenwickTree(K));
+
 		Solution S(N);
 		int solEnergyConsumption = 0;
 
@@ -111,6 +152,10 @@ void Laboratory::constructiveHeuristic(){
 							break;
 						}
 
+					// printf("Sum is: %d\n", occupiedSlots[m].sum(ini, end));
+					// if(occupiedSlots[m].sum(ini, end) != 0)
+					// 	available = false;
+
 					// If slot is available, check if value is interesting.
 					if(available)
 						if(slotSum * sortedMachines[m].first < bestPosition[0]){
@@ -133,6 +178,8 @@ void Laboratory::constructiveHeuristic(){
 
 				// Set selected position as occupied in that machine.
 				occupiedSlots[bestPosition[3]].push_back(make_pair(bestPosition[1], bestPosition[2]));
+				// for(int z = bestPosition[1]; z <= bestPosition[2]; z++)
+					// occupiedSlots[bestPosition[3]].add(z, 1);
 			}
 		}
 

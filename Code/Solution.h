@@ -24,6 +24,7 @@ public:
 	std::pair<int, int> getObj(){ return obj; }
 
 	void setV(int job, int machine, int position);
+	void printSolution();
 	int getV(int x, int y){ return setup[x][y]; }
 };
 

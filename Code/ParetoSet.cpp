@@ -64,6 +64,7 @@ bool ParetoSet::insertSol(int x, int y, const Solution &sol){
 void ParetoSet::printSet(){
 	printf("Solutions: %d\n", getSize());
 
-	for(auto it: s)
+	for(auto &it: s){
 		printf("(%d, %d)\n", it.first, it.second);
+	}
 }
