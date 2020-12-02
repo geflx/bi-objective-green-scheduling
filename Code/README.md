@@ -22,7 +22,7 @@ for each Makespan from MAX to MIN:
 # Class Diagram
 
 <p align="center">
-<img src="../Assets/class_diagram_02_12_20.png" width=760 height=325>
+<img src="../Assets/class_diagram_02_12_20.png" width=860 height=325>
 </p>
 
 
