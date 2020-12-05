@@ -66,5 +66,7 @@ void ParetoSet::printSet(){
 
 	for(auto &it: s){
 		printf("(%d, %d)\n", it.first, it.second);
+
+		mapSol[it].printSolution();
 	}
 }

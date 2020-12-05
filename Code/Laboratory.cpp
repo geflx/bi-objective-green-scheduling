@@ -45,6 +45,7 @@ void Laboratory::printSolutions(){
 	solutions.printSet();
 }
 
+/*
 struct FenwickTree {
     vector<int> bit;  // binary indexed tree
     int n;
@@ -82,6 +83,7 @@ struct FenwickTree {
         return sum(r) - sum(l - 1);
     }
 };
+*/
 
 // Reviews: 0
 void Laboratory::constructiveHeuristic(){
@@ -112,7 +114,7 @@ void Laboratory::constructiveHeuristic(){
 	// Sorting jobs in decreasing order of processing time.
 	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int, int>>());
 
-	for(int i = K; i >= 0 && !impossibleToInsert; i--){
+	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
 
 		/**
 		 * Indicates current slot occupation in the M machines.
@@ -123,7 +125,7 @@ void Laboratory::constructiveHeuristic(){
 		// vector<FenwickTree> occupiedSlots(M, FenwickTree(K));
 
 		Solution S(N);
-		int solEnergyConsumption = 0;
+		int solEnergyConsumption = 0, makespan = -1;
 
 		for(int j = 0; j < N && !impossibleToInsert; j++){
 
@@ -131,10 +133,10 @@ void Laboratory::constructiveHeuristic(){
 			vector<int> bestPosition = {numeric_limits<int>::max(), -1, -1, -1};
 
 			// Finding best slot to fit job.
-			for(int k = 0; k < i - procTime[sortedJobs[j].second] + 1; k++){
+			for(int k = 0; k <= i - procTime[sortedJobs[j].second] + 1; k++){
 				
 				int ini = k, end = k + procTime[sortedJobs[j].second] - 1;
-				int slotSum = (k == 0 ? timePricePreffixSum[end] : timePricePreffixSum[end] - timePricePreffixSum[ini]);
+				int slotSum = (ini == 0 ? timePricePreffixSum[end] : timePricePreffixSum[end] - timePricePreffixSum[ini - 1]);
 
 				// Ignore slot checking if best scenario current sum is worse than bestPosition. 
 				if(slotSum * sortedMachines[0].first >= bestPosition[0])
@@ -158,7 +160,8 @@ void Laboratory::constructiveHeuristic(){
 
 					// If slot is available, check if value is interesting.
 					if(available)
-						if(slotSum * sortedMachines[m].first < bestPosition[0]){
+						if(slotSum * sortedMachines[m].first < bestPosition[0] || 
+						   (slotSum * sortedMachines[m].first == bestPosition[0] && ini <= bestPosition[1])){
 							bestPosition = {slotSum * sortedMachines[m].first, ini, end, m};
 						}
 				}
@@ -176,7 +179,10 @@ void Laboratory::constructiveHeuristic(){
 				// Save job's destinated machine and position in solution.
 				S.setV(sortedJobs[j].second, bestPosition[3], bestPosition[1]);
 
-				// Set selected position as occupied in that machine.
+				// Updating solution makespan.
+				makespan = max(makespan, bestPosition[2]);
+
+				// Mark selected position as occupied in that machine.
 				occupiedSlots[bestPosition[3]].push_back(make_pair(bestPosition[1], bestPosition[2]));
 				// for(int z = bestPosition[1]; z <= bestPosition[2]; z++)
 					// occupiedSlots[bestPosition[3]].add(z, 1);
@@ -185,8 +191,8 @@ void Laboratory::constructiveHeuristic(){
 
 		// If a solution was successfully generated, save it.
 		if(!impossibleToInsert){
-			printf("Inserted: (%d, %d)\n", solEnergyConsumption, i + 1);
-			solutions.insertSol(solEnergyConsumption, i + 1, S);
+			printf("Inserted: (%d, %d)\n", solEnergyConsumption, makespan + 1);
+			solutions.insertSol(solEnergyConsumption, makespan + 1, S);
 		}
 	}	
 }
