@@ -8,6 +8,7 @@
 #include <limits>
 #include <algorithm>
 #include <omp.h>
+#include "FenwickTree.h"
 
 using namespace std;
 
@@ -45,46 +46,6 @@ void Laboratory::printSolutions(){
 	solutions.printSet();
 }
 
-/*
-struct FenwickTree {
-    vector<int> bit;  // binary indexed tree
-    int n;
-
-    // Op2: initializing with an empty array
-    FenwickTree(int n) {
-        this->n = n + 1;
-        bit.assign(n + 1, 0);
-    }
-
-    // Op2: initializing with existing array
-    FenwickTree(vector<int> a)
-        : FenwickTree(a.size()) {
-        for (size_t i = 0; i < a.size(); i++)
-            add(i, a[i]);
-    }
-
-    void add(int idx, int delta) {
-        for (++idx; idx < n; idx += idx & -idx)
-            bit[idx] += delta;
-    }
-
-    // Attention: don't mix both!! Choose one!
-
-	// 1 - Point Update and Range Query
-
-    int sum(int idx) {
-        int ret = 0;
-        for (++idx; idx > 0; idx -= idx & -idx)
-            ret += bit[idx];
-        return ret;
-    }
-
-    int sum(int l, int r) {
-        return sum(r) - sum(l - 1);
-    }
-};
-*/
-
 // Reviews: 0
 void Laboratory::constructiveHeuristic(){
 
@@ -118,11 +79,9 @@ void Laboratory::constructiveHeuristic(){
 
 		/**
 		 * Indicates current slot occupation in the M machines.
-		 * Format: {ini, end} 0-indexed
+		 * Each machine's fenwickTree has M slots, if '1' the slot is visited and '0' otherwise.
 		 */
-		vector<vector<pair<int, int>>> occupiedSlots (M);
-
-		// vector<FenwickTree> occupiedSlots(M, FenwickTree(K));
+		vector<FenwickTree> occupiedSlots(M, FenwickTree(K));	
 
 		Solution S(N);
 		int solEnergyConsumption = 0, makespan = -1;
@@ -147,16 +106,8 @@ void Laboratory::constructiveHeuristic(){
 					bool available = true;
 
 					// Check if slots are available in that machine.
-					for(int z = 0; z < occupiedSlots[m].size(); z++)
-						if((occupiedSlots[m][z].first <= ini && ini <= occupiedSlots[m][z].second)
-						   || (occupiedSlots[m][z].first <= end && end <= occupiedSlots[m][z].second)){
-							available = false;
-							break;
-						}
-
-					// printf("Sum is: %d\n", occupiedSlots[m].sum(ini, end));
-					// if(occupiedSlots[m].sum(ini, end) != 0)
-					// 	available = false;
+					if(occupiedSlots[m].sum(ini, end) != 0)
+						available = false;
 
 					// If slot is available, check if value is interesting.
 					if(available)
@@ -182,17 +133,14 @@ void Laboratory::constructiveHeuristic(){
 				// Updating solution makespan.
 				makespan = max(makespan, bestPosition[2]);
 
-				// Mark selected position as occupied in that machine.
-				occupiedSlots[bestPosition[3]].push_back(make_pair(bestPosition[1], bestPosition[2]));
-				// for(int z = bestPosition[1]; z <= bestPosition[2]; z++)
-					// occupiedSlots[bestPosition[3]].add(z, 1);
+				// Set selected positions as occupied in that machine.
+				for(int z = bestPosition[1]; z <= bestPosition[2]; z++)
+					occupiedSlots[bestPosition[3]].add(z, 1);
 			}
 		}
 
 		// If a solution was successfully generated, save it.
-		if(!impossibleToInsert){
-			printf("Inserted: (%d, %d)\n", solEnergyConsumption, makespan + 1);
+		if(!impossibleToInsert)
 			solutions.insertSol(solEnergyConsumption, makespan + 1, S);
-		}
 	}	
 }
