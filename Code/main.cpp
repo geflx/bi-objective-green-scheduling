@@ -14,7 +14,7 @@ using namespace std;
 
 int main(){
 
-	Laboratory env("Sandbox/RData_45.txt");
+	Laboratory env("Test/manual_inst_1.txt");
 
 	env.constructiveHeuristic();
 	
