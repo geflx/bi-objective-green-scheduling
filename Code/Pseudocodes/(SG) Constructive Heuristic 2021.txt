@@ -1,0 +1,21 @@
+S <- h empty schedules
+P <- sort(P) in non-increasing order
+F <- map[procTime] -> job
+
+for each p in P:
+    for each h in H:
+        Lph <- list of least cost free locations
+        
+    for each j in F(p):
+        if Lph for all H
+            return empty schedule
+        
+        Remove random least-cost location Î
+        Assign location Î to j in Sĥ
+        Remove locations that intersects with Î in Sĥ from Lpĥ
+        Add any new split-locations from Sĥ to Lpĥ
+
+If S is a split-schedule
+    Convert into a feasible schedule S
+    
+    
