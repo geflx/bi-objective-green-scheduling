@@ -1,43 +1,49 @@
+/*
+    @author:    Gabriel Félix
+    @date:      Feb/21
+*/
 
-T <- Table h x N to store job information
-OFt <- "h" Occupation Fenwick Trees to store slot occupation (0 == free, 1 == occupied).
-CFt <- "h" Cost Fenwick Trees to store costs (pos == 0 means occupied, pos != 0 means cost).
-P <- sort(P) in non-increasing order
-F <- map[procTime] -> job
+T   [H][N]  <-  Table to store job id in each slot.
+OFt [H]     <-  Fenwick Trees to store slot status (0 == free, 1 == occupied).
+CFt [H]     <-  Fenwick Trees to store current costs (0 == occupied, dif0 == cost).
+P           <-  Sort(P) in non-increasing order.
+F           <-  map[procTime] -> job.
 
 for each p in P:
 
     for each h in H:
-        Lph <- list of least cost free locations
-        /* For each h:
-                For i = 0 ... N - p
-                    Binary search to find free location [i, POS] in O(log N * log N)
-                    if(found free location)
-                        Calculate cost in O(log N)                
+        Lph <- List of cost of free locations [a, b] in machine "h" which have exactly "p" available slots (i.e. b - a == p).
+        /* 
+            "Lph BUILD METHOD":
+            for i = 0 ... (N - p):
+                Binary search to find free location [i, POS], which POS is the first position which accepts "p" p_time. Cost: O(log N * log N).
+                if(Found free location)
+                    Calculate cost in O(log N) using CFt[h]. Cost: O(log N).          
         */
         
     for each j in F(p):
         
-        minLocation = INF
+        minLocation = INF  /* A structure which stores the global best free location (with minimal cost price) */
         for h in H:
             for each location in Lph:
                 minLocation = min(minLocation, location)
-        
-    
+            
         if minLocation == INF
-            return empty schedule
+            return Empty Schedule  
         
-        Delete Lph (machine h of minLocation)
+        Delete Lph (List of free locations of machine "h", the minLocation machine).
         
-        Assign minLocation Î to j in Sĥ
-        /* Assign the positions of job j in table T   ->       O(slots)
-           Assign "occupied" from minLocation slots at OFt  -> O(slots * log N)
-           Assign cost = 0 in minLocation slots at CFt ->      O(slots * log N)
+        Assign job j to minLocation.
+        /*             
+           "Job j ASSIGNMENT METHOD":
+                Assign job j positions in Table T[h]             ->   Cost:  O(minLocation slots)
+                Assign minLocation slots as "occupied" at OFt[h] ->   Cost:  O(minLocation slots * log N)
+                Assign cost = 0 in minLocation slots at CFt[h]   ->   Cost:  O(minLocation slots * log N)
         */
         
-        Recreate Lph (machine h of minLocation)
+        Recreate Lph using "Lph BUILD METHOD".
 
 If S is a split-schedule
-    Convert into a feasible schedule S
+    Convert into a feasible schedule S.     Cost: O(N * H)
     
     
