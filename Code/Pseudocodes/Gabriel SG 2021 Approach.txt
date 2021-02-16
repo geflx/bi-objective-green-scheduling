@@ -1,0 +1,43 @@
+
+T <- Table h x N to store job information
+OFt <- "h" Occupation Fenwick Trees to store slot occupation (0 == free, 1 == occupied).
+CFt <- "h" Cost Fenwick Trees to store costs (pos == 0 means occupied, pos != 0 means cost).
+P <- sort(P) in non-increasing order
+F <- map[procTime] -> job
+
+for each p in P:
+
+    for each h in H:
+        Lph <- list of least cost free locations
+        /* For each h:
+                For i = 0 ... N - p
+                    Binary search to find free location [i, POS] in O(log N * log N)
+                    if(found free location)
+                        Calculate cost in O(log N)                
+        */
+        
+    for each j in F(p):
+        
+        minLocation = INF
+        for h in H:
+            for each location in Lph:
+                minLocation = min(minLocation, location)
+        
+    
+        if minLocation == INF
+            return empty schedule
+        
+        Delete Lph (machine h of minLocation)
+        
+        Assign minLocation Î to j in Sĥ
+        /* Assign the positions of job j in table T   ->       O(slots)
+           Assign "occupied" from minLocation slots at OFt  -> O(slots * log N)
+           Assign cost = 0 in minLocation slots at CFt ->      O(slots * log N)
+        */
+        
+        Recreate Lph (machine h of minLocation)
+
+If S is a split-schedule
+    Convert into a feasible schedule S
+    
+    
