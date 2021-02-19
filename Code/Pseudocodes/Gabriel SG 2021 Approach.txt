@@ -3,30 +3,33 @@
     @date:      Feb/21
 */
 
-T   [H][N]  <-  Table to store job id in each slot.
-OFt [H]     <-  Fenwick Trees to store slot status (0 == free, 1 == occupied).
+T   [H][T]  <-  Table to store job id in each slot.
+OFt [H]     <-  Fenwick Trees to store slot status (1 == free, 0 == occupied).
 CFt [H]     <-  Fenwick Trees to store current costs (0 == occupied, dif0 == cost).
 P           <-  Sort(P) in non-increasing order.
-F           <-  map[procTime] -> job.
+F           <-  map[procTime] -> job id.
+
+O(P * H * Kmax * log Kmax) + O( P * log N * 
+O(P * 
 
 for each p in P:
 
     for each h in H:
-        Lph <- List of cost of free locations [a, b] in machine "h" which have exactly "p" available slots (i.e. b - a == p).
+        Lph <- /* List */ (Priority Queue) of cost of free locations [a, b] in machine "h" which have exactly "p" available slots (i.e. b - a == p). 
         /* 
             "Lph BUILD METHOD":
             for i = 0 ... (N - p):
                 Binary search to find free location [i, POS], which POS is the first position which accepts "p" p_time. Cost: O(log N * log N).
                 if(Found free location)
-                    Calculate cost in O(log N) using CFt[h]. Cost: O(log N).          
+                    Calculate cost in O(log T) using CFt[h]. Cost: O(log T).          
         */
         
     for each j in F(p):
         
         minLocation = INF  /* A structure which stores the global best free location (with minimal cost price) */
         for h in H:
-            for each location in Lph:
-                minLocation = min(minLocation, location)
+            /* for each location in Lph: */
+            minLocation = min(minLocation, location_h.top())
             
         if minLocation == INF
             return Empty Schedule  
@@ -45,5 +48,8 @@ for each p in P:
 
 If S is a split-schedule
     Convert into a feasible schedule S.     Cost: O(N * H)
+    
+
+
     
     
