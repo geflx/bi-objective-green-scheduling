@@ -9,8 +9,6 @@ CFt [H]     <-  Fenwick Trees to store current costs (0 == occupied, dif0 == cos
 P           <-  Sort(P) in non-increasing order.
 F           <-  map[procTime] -> job id.
 
-O(P * H * Kmax * log Kmax) + O( P * log N * 
-O(P * 
 
 for each p in P:
 

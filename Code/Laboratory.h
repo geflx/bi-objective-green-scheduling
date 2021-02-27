@@ -5,9 +5,11 @@
 
 #include <vector>
 #include "ParetoSet.h"
+#include "Location.h" // Auxiliar class from SimpleSplitGreedyCH.
 
 #ifndef LABORATORY_H
 #define LABORATORY_H
+
 
 class Laboratory{
 
@@ -20,7 +22,12 @@ public:
 	Laboratory(const char *fileDir);
 
 	void constructiveHeuristic();
-	void printSolutions();
+	void printSolutions();	
+
+	void 	 SimpleSplitGreedyCH();
+	Location SimpleSplitGreedyCH_GetBestLocation(const vector<vector<int>> &assignmentTable);
+	bool 	 SimpleSplitGreedyCH_AssignLocation(const vector<vector<int>> &assignmentTable, const Location &insertionLocation, const int jobId, int &objFunction);	
+	Solution SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int>> &assignmentTable, const int SolutionCost, const int SolutionMakespan);
 };
 
 #endif

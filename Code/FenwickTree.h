@@ -4,18 +4,29 @@ using namespace std;
 struct FenwickTree {
     vector<int> bit;  // binary indexed tree
     int n;
-
-    // Op2: initializing with an empty array
+    
+    // Constructor 1: initializing empty array
     FenwickTree(int n) {
         this->n = n + 1;
         bit.assign(n + 1, 0);
     }
 
-    // Op2: initializing with existing array
-    FenwickTree(vector<int> a)
-        : FenwickTree(a.size()) {
+    // Constructor 2: initializing with existing array
+    FenwickTree(const vector<int> &a) : FenwickTree(a.size()) {
         for (size_t i = 0; i < a.size(); i++)
             add(i, a[i]);
+    }
+
+    // Do the same as constructor 2 but in a late initialization.
+    void LateInit(const vector<int> &v) {
+        if(v.size() != this->n) {
+            printf("BIT size and Vector 'v' size doesn't match! Aborting.\n");
+            exit(0);
+        }
+
+        for(size_t i = 0; i < v.size(); i++) {
+            add(i, v[i]);
+        }
     }
 
     void add(int idx, int delta) {

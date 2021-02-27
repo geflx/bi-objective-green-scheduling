@@ -13,7 +13,7 @@ class Solution{
 
 private:
 	std::vector<std::vector<int>> setup;
-	std::pair<int, int> obj;
+	std::pair<int, int> obj; // (Cost, makespan)
 	int N;
 
 public:

@@ -11,7 +11,7 @@ Instances are from the [2021's paper about this bi-objective problem](https://gi
 
     RData_number.txt:
     K N M           (Number of time slots/jobs/machines)
-    T1, T2, ..., TK (Time slots energy prices)
-    J1, J2, ..., JK (Jobs processing times)
-    H1, H2, ..., HM (Machines unitary energy price)
+    T1, T2, ..., Tk (Time slots energy prices)
+    J1, J2, ..., Jn (Jobs processing times)
+    H1, H2, ..., Hm (Machines unitary energy price)
     
