@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "ParetoSet.h"
 
 using namespace std;
@@ -69,4 +70,14 @@ void ParetoSet::printSet(){
 
 		//mapSol[it].printSolution();
 	}
+}
+
+vector<Solution> ParetoSet::getSolutions(){
+
+	vector<Solution> allSolutions;
+
+	for(auto &it: mapSol)
+		allSolutions.push_back(it.second);
+
+	return allSolutions;	
 }

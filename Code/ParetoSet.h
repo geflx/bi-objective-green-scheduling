@@ -5,6 +5,7 @@
 
 #include <set>
 #include <map>
+#include <vector>
 #include "Solution.h"
 
 #ifndef PARETOSET_H
@@ -20,6 +21,8 @@ public:
 	ParetoSet(){};
 	int getSize(){ 	return s.size();	};
 	bool empty(){	return s.empty();	};
+
+	std::vector<Solution> getSolutions();
 
 	bool isDominated(int x, int y);
 	bool insertSol(int x, int y, const Solution &sol);

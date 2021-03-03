@@ -8,6 +8,7 @@
 #include <limits>
 #include <algorithm>
 #include <omp.h>
+#include <assert.h>
 #include "FenwickTree.h"
 
 using namespace std;
@@ -46,6 +47,65 @@ void Laboratory::printSolutions(){
 	solutions.printSet();
 }
 
+
+void Laboratory::checkSolutions() {
+
+	vector<Solution> vecSol = this->solutions.getSolutions();
+
+	for(Solution &S : vecSol){
+
+		int cost = 0, makespan = -1;
+
+		for(int i = 0; i < N; i++){
+
+			int machine = S.getV(0, i);
+			int pos = S.getV(1, i);
+			int end = pos + procTime[i] - 1;
+
+			// Updating total cost and total makespan.
+			for(int k = pos; k <= end; k++)
+				cost += (timePrice[k] * machineEnergy[machine]);
+			
+			makespan = max(makespan, pos + procTime[i] - 1);
+
+			for(int j = 0; j < N; j++){
+
+				int machineTmp = S.getV(0, j);
+
+				// Return if is same job or different machines.
+				if(i == j || (machine != machineTmp))
+					continue;
+				
+				int posTmp = S.getV(1, j);
+				int endTmp = posTmp + procTime[j] - 1;
+
+				// Checking job's gap overlay.
+				if((posTmp >= pos && posTmp <= end) || (endTmp >= pos && endTmp <= end)) {
+
+					pair<int, int> tmpObj = S.getObj();
+					printf("Solution (%d,%d) because job %d position conflicts with job %d at machine %d.",
+							tmpObj.first, tmpObj.second, i, j, machine);
+					exit(0);
+				}
+			}
+		}
+
+		pair<int, int> objF = S.getObj();
+
+		if(objF.first != cost) {
+			printf("Problem in solution (%d,%d): expected cost %d differs from main cost %d (calculated during construction).",
+					objF.first, objF.second, cost, objF.first);
+			exit(0);
+		}
+
+		if(objF.second != makespan) {
+			printf("Problem in solution (%d,%d): expected makespan %d differs from main makespan %d (calculated during construction).",
+					objF.first, objF.second, makespan, objF.second);
+			exit(0);
+		}
+	}
+}
+
 // Reviews: 0
 void Laboratory::constructiveHeuristic(){
 
@@ -81,7 +141,7 @@ void Laboratory::constructiveHeuristic(){
 		 * Indicates current slot occupation in the M machines.
 		 * Each machine's fenwickTree has M slots, if '1' the slot is visited and '0' otherwise.
 		 */
-		vector<FenwickTree> occupiedSlots(M, FenwickTree(K, 0));	
+		vector<FenwickTree> occupiedSlots(M, FenwickTree(K));	
 
 		Solution S(N);
 		int solEnergyConsumption = 0, makespan = -1;
@@ -145,50 +205,10 @@ void Laboratory::constructiveHeuristic(){
 	}	
 }
 
-// Revisar!!!!!!!!
-Location Laboratory::SimpleSplitGreedyCH_GetBestLocation(const vector<vector<int>> &assignmentTable, int currK, int currP) {
-
-	Location bestLocation;
-
-	for(int i = 0; i < M; i++) {
-
-		int leftDelimiter = (currK - currP);
-
-		for(int j = 0; j <= leftDelimiter; j++){
-
-			// Location must start in an empty slot.
-			if(assignmentTable[i][j] != -1)
-				continue;
-
-			int numSlots = 0, cost = 0, end = j;
-			for(end = j; end <= currK && numSlots < currP; end++){
-				if(assignmentTable[i][end] == -1){
-					numSlots++;
-					cost += procTime[end] * machineEnergy[i];
-				}
-			}
-
-			if(numSlots == currP) {
-				Location tmp;
-
-				tmp.machine = i;
-				tmp.cost = cost;
-				tmp.beg = j;
-				tmp.end = end - 1;
-				tmp.isContinuous = (end - beg == currP ? true : false);
-
-				bestLocation = max(bestLocation, tmp);
-			}
-		}
-	}
-
-	return bestLocation;
-}
-
-// Revisar!!!!!!!!
+// Reviews: 1
 bool Laboratory::SimpleSplitGreedyCH_AssignLocation(vector<vector<int>> &assignmentTable, const Location &insertionLocation, const int jobId, int &objFunction) {
 	
-	// Invalid location. Return false.
+	// Invalid machine, it means there is no such feasible location.
 	if(insertionLocation.machine == -1)
 		return false;
 
@@ -201,38 +221,96 @@ bool Laboratory::SimpleSplitGreedyCH_AssignLocation(vector<vector<int>> &assignm
 	return true;
 }
 
-// Revisar!!!!!!!!
+// Reviews: 1
 Solution Laboratory::SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int>> &assignmentTable, const int currK, const int SolutionCost, const int SolutionMakespan) {
-	Solution S;
-
+	
+	Solution S(N);
 	set<int> insertedJobs;
 
-	for(int i = 0; i < H; i++) {
+	for(int i = 0; i < M; i++) {
 
 		int nextSlot = -1;
 
 		for(int j = 0; j <= currK; j++) {
 
-			if(assignmentTable[i][j] != -1 && insertedJobs.find(assignmentTable[i][j]) != insertedJobs.end()) {
+			if(assignmentTable[i][j] != -1 && insertedJobs.find(assignmentTable[i][j]) == insertedJobs.end()) {
 
 				if(nextSlot == -1) {
+
+					//Set job x in machine i at slot j.
 					S.setV(assignmentTable[i][j], i, j);
 					nextSlot = j + procTime[assignmentTable[i][j]];
 				}
 				else {
+
 					S.setV(assignmentTable[i][j], i, nextSlot);
-					nextSlot = nextSlot + procTime[assignmentTable[i][j]];
+					nextSlot += procTime[assignmentTable[i][j]];
 				}
+
+				insertedJobs.insert(assignmentTable[i][j]);
 			}
 		}
 	}
 
+	assert(insertedJobs.size() == N);
+
 	S.setObj(SolutionCost, SolutionMakespan);
+
+	for(int i = 0; i < M; i++) {
+		for(int j = 0; j <= currK; j++){
+			printf("%d ", assignmentTable[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n\n\n\n");
 
 	return S;
 }
 
-// Revisar!!!!!!!!
+// Reviews: 0
+Location Laboratory::SimpleSplitGreedyCH_GetBestLocation(const vector<vector<int>> &assignmentTable, int currK, int currP) {
+
+	Location bestLocation;
+
+	for(int i = 0; i < M; i++) {
+
+		int leftDelimiter = currK - currP + 1;
+
+		for(int j = 0; j <= leftDelimiter; j++){
+
+			// Location must start in an empty slot.
+			if(assignmentTable[i][j] != -1)
+				continue;
+
+			int numSlots = 0, cost = 0, end = j;
+
+			for(end = j; (end <= currK) && (numSlots < currP); end++){
+
+				// If slot is empty...
+				if(assignmentTable[i][end] == -1){
+					
+					numSlots++;
+					cost += procTime[end] * machineEnergy[i];
+				}
+			}
+
+			if(numSlots != currP)
+				continue;
+
+			if(cost < bestLocation.cost || (cost == bestLocation.cost && j < bestLocation.beg)) {
+
+				bestLocation.machine = i;
+				bestLocation.cost = cost;
+				bestLocation.beg = j;
+				bestLocation.end = end - 1;
+			}
+		}
+	}
+
+	return bestLocation;
+}
+
+// Reviews: 0
 void Laboratory::SimpleSplitGreedyCH() {
 
 	bool impossibleToInsert = false;
@@ -248,18 +326,19 @@ void Laboratory::SimpleSplitGreedyCH() {
 
 	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
 
-		// Initialization table starts empty.
-		vector<vector<int>> assignmentTable (M, vector<int> (i, -1));
+		// Assignment table starts empty.
+		vector<vector<int>> assignmentTable (M, vector<int> (i + 1, -1));
 		int solutionCost = 0, solutionMakespan = -1;
-		bool isSplitSchedule = false;
 
 		for(int j = 0; j < N; j++) {
 
+			// Get best location to insert.
 			Location insertionLocation = SimpleSplitGreedyCH_GetBestLocation(assignmentTable, i, sortedJobs[j].first);
-			// if(!insertionLocation.isContinuous)
-			// 	isSplitSchedule = true;
+			
+			// Update solution makespan.
 			solutionMakespan = max(solutionMakespan, insertionLocation.end);
 
+			// Trying to assign job to location.
 			if(!SimpleSplitGreedyCH_AssignLocation(assignmentTable, insertionLocation, sortedJobs[j].second, solutionCost)){
 				impossibleToInsert = true;
 				break;
@@ -267,7 +346,7 @@ void Laboratory::SimpleSplitGreedyCH() {
 		}
 
 		if(!impossibleToInsert) {
-			Solution S = convertSolution(assignmentTable, i, solutionCost, solutionMakespan);
+			Solution S = SimpleSplitGreedyCH_ConvertSolution(assignmentTable, i, solutionCost, solutionMakespan);
 			solutions.insertSol(solutionCost, solutionMakespan, S); // Warning: check if it is solutionMakespan or solutionMakespan + 1
 		}
 	}

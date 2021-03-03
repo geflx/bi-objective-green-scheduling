@@ -24,10 +24,12 @@ public:
 	void constructiveHeuristic();
 	void printSolutions();	
 
+	void checkSolutions();
+
+	Location SimpleSplitGreedyCH_GetBestLocation(const vector<vector<int>> &assignmentTable, int currentK, int currentP);
+	bool SimpleSplitGreedyCH_AssignLocation(vector<vector<int>> &assignmentTable, const Location &insertionLocation, const int jobId, int &objFunction);	
+	Solution SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int>> &assignmentTable, const int currentK, const int SolutionCost, const int SolutionMakespan);
 	void 	 SimpleSplitGreedyCH();
-	Location SimpleSplitGreedyCH_GetBestLocation(const vector<vector<int>> &assignmentTable);
-	bool 	 SimpleSplitGreedyCH_AssignLocation(const vector<vector<int>> &assignmentTable, const Location &insertionLocation, const int jobId, int &objFunction);	
-	Solution SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int>> &assignmentTable, const int SolutionCost, const int SolutionMakespan);
 };
 
 #endif
