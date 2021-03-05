@@ -14,7 +14,7 @@ using namespace std;
 
 int main(){
 
-	Laboratory env("Sandbox/RData_90.txt");
+	Laboratory env("Sandbox/RData_1.txt");
 
 	env.SimpleSplitGreedyCH();
 	

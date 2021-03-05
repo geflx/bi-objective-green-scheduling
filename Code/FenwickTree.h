@@ -1,4 +1,6 @@
 #include <vector>
+#include <stdio.h>  //  Printf.
+#include <stdlib.h> //  Exit.
 using namespace std;
 
 struct FenwickTree {

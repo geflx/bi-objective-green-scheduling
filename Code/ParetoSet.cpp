@@ -79,5 +79,5 @@ vector<Solution> ParetoSet::getSolutions(){
 	for(auto &it: mapSol)
 		allSolutions.push_back(it.second);
 
-	return allSolutions;	
+	return allSolutions;
 }

@@ -17,4 +17,11 @@ class Location{
 	friend bool operator< (const Location &l1, const Location &l2);
 };
 
+class CompareLocation{
+	public:
+	    bool operator() (const Location &a, const Location &b){
+	        return a.cost < b.cost;
+	    }
+};
+
 #endif

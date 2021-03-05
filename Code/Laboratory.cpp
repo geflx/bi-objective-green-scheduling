@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <omp.h>
 #include <assert.h>
-#include "FenwickTree.h"
 
 using namespace std;
 
@@ -206,7 +205,7 @@ void Laboratory::constructiveHeuristic(){
 				// Save job's destinated machine and position in solution.
 				S.setV(sortedJobs[j].second, bestPosition[3], bestPosition[1]);
 
-				// Updating solution makespan.\
+				// Updating solution makespan.
 				makespan = max(makespan, bestPosition[2]);
 
 				// Set selected positions as occupied in that machine.
@@ -275,6 +274,14 @@ Solution Laboratory::SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int
 	assert(insertedJobs.size() == N);
 
 	S.setObj(SolutionCost, SolutionMakespan);
+
+	for(int i = 0; i < M; i++) {
+		for(int j = 0; j < currK; j++) {
+			printf("%d ", assignmentTable[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n\n\n\n");
 
 	return S;
 }
@@ -364,24 +371,96 @@ void Laboratory::SimpleSplitGreedyCH() {
 	}
 }
 
-// void Laboratory::SplitGreedyCH(){
+// void Laboratory::FenwickTreeSplitGreedyCH_BuildFreeLocations(vector<vector<Location>> &vecLocation, const int machine, const int currK, const int currP, const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, vector<FenwickTree> &costFT){
 
-// 	// Format: {value, id}.
-// 	vector<pair<int, int>> sortedJobs(N);
+// 	vecLocation[machine].clear();
 
+// 	for(int i = 0; i <= currK && occupationFT[machine].sum(i, currK) >= currP; i++) {
+
+// 		if(assignmentTable[machine][i] != -1)
+// 			continue;
+
+// 		int beg = i, end = currK;
+
+// 		while(occupationFT[machine].sum(i, end) > currP){
+
+// 			int mid = (beg + end) / 2;
+// 			int f = occupationFT[machine].sum(i, mid);
+
+// 			if(f < currP) {
+// 				beg = mid;
+// 			}
+// 			else if(f == currP) {
+// 				end = mid;
+// 			}
+// 			else if(f > currP) {
+// 				end = mid - 1;
+// 			}
+// 		}
+
+// 		Location tmp;
+// 		tmp.cost = costFT[machine].sum(i, end);
+// 		tmp.beg = i;
+// 		tmp.end = end;
+// 		tmp.machine = machine;
+
+// 		vecLocation[machine].push_back(tmp);
+
+// 	}
+
+// 	sort(vecLocation[machine].begin(), vecLocation[machine].end(), [](const Location &a, const Location &b) {return (a.cost < b.cost);});
+
+// }
+
+// void Laboratory::FenwickTreeSplitGreedyCH(){
+	
 // 	bool impossibleToInsert = false;
 
-// 	for(int i = 0; i < N; i++)
-// 		sortedJobs[i] = make_pair(procTime[i], i);
+// 	map<int, vector<int>> procTimeToJob;
 
-// 	// Sorting jobs in decreasing order of processing time.
-// 	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int, int>>());
+// 	for(int i = 0; i < N; i++)
+// 		procTimeToJob[procTime[i]].push_back(i);
+
+// 	// Template vectors: occupationFT will initialize with value "1" and costFT with time slot prices.
+// 	vector<int> occupationFT_Template(K, 1);
+// 	vector<int> costFT_Template = timePrice;
+
 
 // 	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
 
-// 		vector<FenwickTree> occupationFT(M, FenwickTree(i));
-// 		vector<FenwickTree> costFT(M, FenwickTree(i));
+// 		// Resizing template vectors to match with currK iteration size.
+// 		occupationFT_Template.resize(i + 1);
+// 		costFT_Template.resize(i + 1);
 
+// 		// Building Occupation Fenwick Trees and Cost Fenwick Trees, one per each machine.
+// 		vector<FenwickTree> occupationFT(M, FenwickTree(occupationFT_Template));
+// 		vector<FenwickTree> costFT(M, FenwickTree(costFT_Template));
 
+// 		// Assignment table starts empty.
+// 		vector<vector<int>> assignmentTable (M, vector<int> (i + 1, -1));
+// 		int solutionCost = 0, solutionMakespan = -1;
+
+// 		for(auto it : procTimeToJob) {
+
+// 			int currP = it.first;
+
+// 			vector<vector<Location>> vecLocation (M); 
+
+// 			for(int k = 0; k < M; k++) {
+// 				FenwickTreeSplitGreedyCH_BuildFreeLocations(vecLocation, k, i, currP, assignmentTable, occupationFT, costFT);
+// 			}
+
+// 			for(int j = 0; j < it.second.size(); j++) {
+
+// 				Location bestLocation;
+
+// 				for(int k = 0; k < M; k++)
+// 					if(vecLocation[k].size() != 0)
+// 						if(vecLocation[k].back().cost < bestLocation.cost || 
+// 						  (vecLocation[k].back().cost == bestLocation.cost && vecLocation[k].back().beg < bestLocation.beg))
+// 							bestLocation = vecLocation[k].back;
+
+// 			}
+// 		}
 // 	}
 // }
