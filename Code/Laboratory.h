@@ -36,10 +36,13 @@ public:
 	void 	 SimpleSplitGreedyCH();
 
 	// Fenwick Tree Split Greedy Construct Heuristic (SGS)
-	// void FenwickTreeSplitGreedyCH_BuildFreeLocations(vector<vector<Location>> &vecLocation, const int machine, const int currK, const int currP, 
-													// const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, 
-													// vector<FenwickTree> &costFT);
-	// void FenwickTreeSplitGreedyCH(); // PREENCHER!!
+
+	bool FenwickTreeSplitGreedyCH_AssignLocation(vector<vector<int>> &assignmentTable, const Location &insertionLocation, const int jobId, 
+														int &solutionCost, vector<FenwickTree> &occupationFT, vector<FenwickTree> &costFT);
+	void FenwickTreeSplitGreedyCH_BuildFreeLocations(vector<vector<Location>> &vecLocation, const int machine, const int currK, const int currP, 
+													const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, 
+													vector<FenwickTree> &costFT);
+	void FenwickTreeSplitGreedyCH(); // PREENCHER!!
 };
 
 #endif

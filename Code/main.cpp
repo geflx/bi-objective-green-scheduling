@@ -16,7 +16,8 @@ int main(){
 
 	Laboratory env("Sandbox/RData_1.txt");
 
-	env.SimpleSplitGreedyCH();
+	//env.SimpleSplitGreedyCH();
+	env.FenwickTreeSplitGreedyCH();
 	
 	env.checkSolutions();
 
