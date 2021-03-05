@@ -30,4 +30,4 @@ LaboratoryTest.o: Laboratory.cpp Laboratory.h
 
 
 clean:
-	rm *.o output
+	rm *.o

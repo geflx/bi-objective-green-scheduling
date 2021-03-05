@@ -62,10 +62,26 @@ void Laboratory::checkSolutions() {
 			int pos = S.getV(1, i);
 			int end = pos + procTime[i] - 1;
 
+
+			if(machine < 0 || machine > M) {
+				printf("Machine is out of boundaries [0, %d], id is: %d.\n", M - 1, machine);
+				exit(0);
+			}
+
+			if(pos < 0 || pos > S.getObj().second) {
+				printf("Initial position is out of boundaries [0, %d], position is: %d.\n", S.getObj().second, pos);
+				exit(0);
+			}
+
+			if(end < 0 || end > S.getObj().second) {
+				printf("End position is out of boundaries [0, %d], end is: %d.\n", S.getObj().second, end);
+				exit(0);
+			}
+
 			// Updating total cost and total makespan.
 			for(int k = pos; k <= end; k++)
 				cost += (timePrice[k] * machineEnergy[machine]);
-			
+	
 			makespan = max(makespan, pos + procTime[i] - 1);
 
 			for(int j = 0; j < N; j++){
@@ -233,6 +249,10 @@ Solution Laboratory::SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int
 
 		for(int j = 0; j <= currK; j++) {
 
+			// Reseting next slot cause a free slot was found.
+			if(assignmentTable[i][j] == -1 && nextSlot != -1)
+				nextSlot = -1;
+
 			if(assignmentTable[i][j] != -1 && insertedJobs.find(assignmentTable[i][j]) == insertedJobs.end()) {
 
 				if(nextSlot == -1) {
@@ -255,14 +275,6 @@ Solution Laboratory::SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int
 	assert(insertedJobs.size() == N);
 
 	S.setObj(SolutionCost, SolutionMakespan);
-
-	for(int i = 0; i < M; i++) {
-		for(int j = 0; j <= currK; j++){
-			printf("%d ", assignmentTable[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n\n\n\n");
 
 	return S;
 }
@@ -290,14 +302,14 @@ Location Laboratory::SimpleSplitGreedyCH_GetBestLocation(const vector<vector<int
 				if(assignmentTable[i][end] == -1){
 					
 					numSlots++;
-					cost += procTime[end] * machineEnergy[i];
+					cost += timePrice[end] * machineEnergy[i];
 				}
 			}
-
+			
 			if(numSlots != currP)
 				continue;
 
-			if(cost < bestLocation.cost || (cost == bestLocation.cost && j < bestLocation.beg)) {
+			if(cost != 0 && cost < bestLocation.cost || (cost == bestLocation.cost && j < bestLocation.beg)) {
 
 				bestLocation.machine = i;
 				bestLocation.cost = cost;
@@ -325,7 +337,7 @@ void Laboratory::SimpleSplitGreedyCH() {
 	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int, int>>());
 
 	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
-
+		
 		// Assignment table starts empty.
 		vector<vector<int>> assignmentTable (M, vector<int> (i + 1, -1));
 		int solutionCost = 0, solutionMakespan = -1;
@@ -352,27 +364,24 @@ void Laboratory::SimpleSplitGreedyCH() {
 	}
 }
 
+// void Laboratory::SplitGreedyCH(){
 
-/*
-void Laboratory::SplitGreedyCH(){
+// 	// Format: {value, id}.
+// 	vector<pair<int, int>> sortedJobs(N);
 
-	// Format: {value, id}.
-	vector<pair<int, int>> sortedJobs(N);
+// 	bool impossibleToInsert = false;
 
-	bool impossibleToInsert = false;
+// 	for(int i = 0; i < N; i++)
+// 		sortedJobs[i] = make_pair(procTime[i], i);
 
-	for(int i = 0; i < N; i++)
-		sortedJobs[i] = make_pair(procTime[i], i);
+// 	// Sorting jobs in decreasing order of processing time.
+// 	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int, int>>());
 
-	// Sorting jobs in decreasing order of processing time.
-	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int, int>>());
+// 	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
 
-	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
-
-		vector<FenwickTree> occupationFT(M, FenwickTree(i));
-		vector<FenwickTree> costFT(M, FenwickTree(i));
+// 		vector<FenwickTree> occupationFT(M, FenwickTree(i));
+// 		vector<FenwickTree> costFT(M, FenwickTree(i));
 
 
-	}
-}
-*/
+// 	}
+// }

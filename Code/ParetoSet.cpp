@@ -66,7 +66,7 @@ void ParetoSet::printSet(){
 	printf("Solutions: %d\n", getSize());
 
 	for(auto &it: s){
-		printf("(%d, %d)\n", it.first, it.second);
+		printf("(%d, %d)\n", it.first, it.second + 1);
 
 		//mapSol[it].printSolution();
 	}
