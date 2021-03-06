@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <omp.h>
 #include <assert.h>
+#include <iostream>
 
 using namespace std;
 
@@ -271,17 +272,15 @@ Solution Laboratory::SimpleSplitGreedyCH_ConvertSolution(const vector<vector<int
 		}
 	}
 
-	assert(insertedJobs.size() == N);
-
 	S.setObj(SolutionCost, SolutionMakespan);
 
-	for(int i = 0; i < M; i++) {
-		for(int j = 0; j < currK; j++) {
-			printf("%d ", assignmentTable[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n\n\n\n");
+	// \for(int i = 0; i < M; i++) {
+	// 	for(int j = 0; j < currK; j++) {
+	// 		printf("%d ", assignmentTable[i][j]);
+	// 	}
+	// 	printf("\n");
+	// }
+	// printf("\n\n\n\n");
 
 	return S;
 }
@@ -343,6 +342,7 @@ void Laboratory::SimpleSplitGreedyCH() {
 	// Sorting jobs in decreasing order of processing time.
 	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int, int>>());
 
+	
 	for(int i = K - 1; i >= 0 && !impossibleToInsert; i--){
 		
 		// Assignment table starts empty.
@@ -363,12 +363,12 @@ void Laboratory::SimpleSplitGreedyCH() {
 				break;
 			}
 		}
-
+		
 		if(!impossibleToInsert) {
 			Solution S = SimpleSplitGreedyCH_ConvertSolution(assignmentTable, i, solutionCost, solutionMakespan);
 			solutions.insertSol(solutionCost, solutionMakespan, S); 
 		}
-	}
+	}	
 }
 
 bool Laboratory::FenwickTreeSplitGreedyCH_AssignLocation(vector<vector<int>> &assignmentTable, const Location &insertionLocation, const int jobId, 
@@ -379,16 +379,18 @@ bool Laboratory::FenwickTreeSplitGreedyCH_AssignLocation(vector<vector<int>> &as
 		return false;
 
 	int machine = insertionLocation.machine;
+	int assignedSlots = 0;
 
-	for(int i = insertionLocation.beg; i <= insertionLocation.end; i++) {
+	for(int i = insertionLocation.beg; i <= insertionLocation.end && assignedSlots < procTime[jobId]; i++) {
 
 		if(assignmentTable[machine][i] == -1) {
 
 			assignmentTable[machine][i] = jobId;
+			assignedSlots++;
 
 			occupationFT[machine].add(i, -1);
 
-			costFT[machine].add(i, -timePrice[i]);
+			costFT[machine].add(i, -timePrice[i]);	
 		}
 	}
 
@@ -435,15 +437,14 @@ void Laboratory::FenwickTreeSplitGreedyCH_BuildFreeLocations(vector<vector<Locat
 
 	}
 
-	sort(vecLocation[machine].begin(), vecLocation[machine].end(), [](const Location &a, const Location &b) {return (a.cost < b.cost);});
-
+	sort(vecLocation[machine].begin(), vecLocation[machine].end(), [](const Location &a, const Location &b) {return (a.cost > b.cost);});
 }
 
 void Laboratory::FenwickTreeSplitGreedyCH(){
 	
 	bool impossibleToInsert = false;
 
-	map<int, vector<int>> procTimeToJob;
+	map<int, vector<int>, greater<int>> procTimeToJob;
 
 	for(int i = 0; i < N; i++)
 		procTimeToJob[procTime[i]].push_back(i);
@@ -472,9 +473,9 @@ void Laboratory::FenwickTreeSplitGreedyCH(){
 
 			vector<vector<Location>> vecLocation (M); 
 
-			for(int k = 0; k < M; k++) {
+			for(int k = 0; k < M; k++)
 				FenwickTreeSplitGreedyCH_BuildFreeLocations(vecLocation, k, i, currP, assignmentTable, occupationFT, costFT);
-			}
+			
 
 			for(int j = 0; j < it.second.size(); j++) {
 
