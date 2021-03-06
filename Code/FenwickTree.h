@@ -19,6 +19,12 @@ struct FenwickTree {
             add(i, a[i]);
     }
 
+    // Constructor 2: initializing with a part of an existing array
+    FenwickTree(const vector<int> &a, int n) : FenwickTree(n) {
+        for (size_t i = 0; i < n; i++)
+            add(i, a[i]);
+    }
+
     // Do the same as constructor 2 but in a late initialization.
     void LateInit(const vector<int> &v) {
         if(v.size() != this->n) {

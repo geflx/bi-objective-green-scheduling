@@ -44,10 +44,10 @@ public:
 													vector<FenwickTree> &costFT);
 	void FenwickTreeSplitGreedyCH(); // PREENCHER!!
 
-	// void Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(Location &bestLocation, const int currK, const int currP, 
-	//													const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, vector<FenwickTree> &costFT);
+	 void Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(Location &bestLocation, const int currK, const int currP, 
+														const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, vector<FenwickTree> &costFT);
 
-	// void Fast_FenwickTreeSplitGreedyCH(); // PREENCHER!!
+	 void Fast_FenwickTreeSplitGreedyCH(); // PREENCHER!!
 };
 
 #endif

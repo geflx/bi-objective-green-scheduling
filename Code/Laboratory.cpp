@@ -511,7 +511,7 @@ void Laboratory::FenwickTreeSplitGreedyCH(){
 	}
 }
 
-/*q
+
 void Laboratory::Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(Location &bestLocation, const int currK, const int currP, const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, vector<FenwickTree> &costFT){
 
 	for(int machine = 0; machine < M; machine++){
@@ -551,66 +551,71 @@ void Laboratory::Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(Location &bes
 
 void Laboratory::Fast_FenwickTreeSplitGreedyCH(){
 	
-	bool impossibleToInsert = false;
+	map<int, vector<int>, greater<int>> procTimeToJob;
+	int maxPTime = -1;
 
-	vector<pair<int, int>> sortedJobs (N);
-
-	for(int i = 0; i < N; i++)
-		sortedJobs[i] = make_pair(procTime[i], i);
-
-	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int,int>>());
+	for(int i = 0; i < N; i++){
+		maxPTime = max(maxPTime, procTime[i]);
+		procTimeToJob[procTime[i]].push_back(i);
+	}
 
 	// Template vectors: occupationFT will initialize with value "1" and costFT with time slot prices.
 	vector<int> occupationFT_Template(K, 1);
 	vector<int> costFT_Template = timePrice;
 
-	vector<bool> visited(K, false);
-
 	#pragma omp parallel for
-		for(int i = K - 1; i >= 0; i--){
-
-			visited[i] = true;
-
-			// Resizing template vectors to match with currK iteration size.
-			occupationFT_Template.resize(i + 1);
-			costFT_Template.resize(i + 1);
+		for(int i = K - 1; i >= maxPTime; i--){
 
 			// Building Occupation Fenwick Trees and Cost Fenwick Trees, one per each machine.
-			vector<FenwickTree> occupationFT(M, FenwickTree(occupationFT_Template));
-			vector<FenwickTree> costFT(M, FenwickTree(costFT_Template));
+			vector<FenwickTree> occupationFT(M, FenwickTree(occupationFT_Template, i + 1));
+			vector<FenwickTree> costFT(M, FenwickTree(costFT_Template, i + 1));
 
 			// Assignment table starts empty.
 			vector<vector<int>> assignmentTable (M, vector<int> (i + 1, -1));
 			int solutionCost = 0, solutionMakespan = -1;
 
-			for(int j = 0; j < N; j++) {
+			bool infeasible = false;
 
-				int job = sortedJobs[j].second;
-				int currP = sortedJobs[j].first;
+			for(auto it : procTimeToJob) {
 
-				Location bestLocation;
+				if(infeasible)
+					break;
 
-				if(!impossibleToInsert)
-					Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(bestLocation, i, currP, assignmentTable, occupationFT, costFT);
+				int currP = it.first;
+
+				vector<vector<Location>> vecLocation (M); 
+
+				for(int k = 0; k < M; k++)
+					FenwickTreeSplitGreedyCH_BuildFreeLocations(vecLocation, k, i, currP, assignmentTable, occupationFT, costFT);
 				
-				
-				if(!impossibleToInsert && !FenwickTreeSplitGreedyCH_AssignLocation(assignmentTable, bestLocation, job, solutionCost, occupationFT, costFT)){
-					impossibleToInsert = true;
+				for(int j = 0; j < it.second.size() && !infeasible; j++) {
+
+					Location bestLocation;
+
+					for(int k = 0; k < M; k++)
+						if(vecLocation[k].size() != 0)
+							if(vecLocation[k].back().cost < bestLocation.cost || 
+							  (vecLocation[k].back().cost == bestLocation.cost && vecLocation[k].back().beg < bestLocation.beg))
+								bestLocation = vecLocation[k].back();
+
+					if(!FenwickTreeSplitGreedyCH_AssignLocation(assignmentTable, bestLocation, it.second[j], solutionCost, occupationFT, costFT)){
+						infeasible = true;
+						break;
+					}
+					else{
+						solutionMakespan = max(solutionMakespan, bestLocation.end);
+					}
+
+					// If there is another job which happens after "j", rebuild free locations from the current best location machine.
+					if(!infeasible && j + 1 < it.second.size())
+						FenwickTreeSplitGreedyCH_BuildFreeLocations(vecLocation, bestLocation.machine, i, currP, assignmentTable, occupationFT, costFT);
 				}
-						
-				if(!impossibleToInsert)
-					solutionMakespan = max(solutionMakespan, bestLocation.end);
 			}
 
-			if(!impossibleToInsert && solutionCost > 0) {
+			if(!infeasible) {
 				Solution S = SimpleSplitGreedyCH_ConvertSolution(assignmentTable, i, solutionCost, solutionMakespan);
-				printf("%d, %d\n", solutionCost, solutionMakespan);
 				solutions.insertSol(solutionCost, solutionMakespan, S); 
 			}
 		}
-
-	for(int i = 0; i < K; i++)
-		cout << (visited[i] ? "1" : "0");
-	cout << "\n";
 }
-*/
+
