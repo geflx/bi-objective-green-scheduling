@@ -510,3 +510,107 @@ void Laboratory::FenwickTreeSplitGreedyCH(){
 		}
 	}
 }
+
+/*q
+void Laboratory::Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(Location &bestLocation, const int currK, const int currP, const vector<vector<int>> &assignmentTable, vector<FenwickTree> &occupationFT, vector<FenwickTree> &costFT){
+
+	for(int machine = 0; machine < M; machine++){
+		for(int i = 0; i <= currK && occupationFT[machine].sum(i, currK) >= currP; i++) {
+
+			if(assignmentTable[machine][i] != -1)
+				continue;
+
+			int beg = i, end = currK;
+
+			while(occupationFT[machine].sum(i, end) > currP){
+
+				int mid = (beg + end) / 2;
+				int f = occupationFT[machine].sum(i, mid);
+
+				if(f < currP) {
+					beg = mid;
+				}
+				else if(f == currP) {
+					end = mid;
+				}
+				else if(f > currP) {
+					end = mid - 1;
+				}
+			}
+
+			int costTmp = costFT[machine].sum(i, end) * machineEnergy[machine];
+			if(costTmp < bestLocation.cost || (costTmp == bestLocation.cost && i < bestLocation.beg)){
+				bestLocation.cost = costTmp;
+				bestLocation.beg = i;
+				bestLocation.end = end;
+				bestLocation.machine = machine;
+			}
+		}
+	}
+}
+
+void Laboratory::Fast_FenwickTreeSplitGreedyCH(){
+	
+	bool impossibleToInsert = false;
+
+	vector<pair<int, int>> sortedJobs (N);
+
+	for(int i = 0; i < N; i++)
+		sortedJobs[i] = make_pair(procTime[i], i);
+
+	sort(sortedJobs.begin(), sortedJobs.end(), greater<pair<int,int>>());
+
+	// Template vectors: occupationFT will initialize with value "1" and costFT with time slot prices.
+	vector<int> occupationFT_Template(K, 1);
+	vector<int> costFT_Template = timePrice;
+
+	vector<bool> visited(K, false);
+
+	#pragma omp parallel for
+		for(int i = K - 1; i >= 0; i--){
+
+			visited[i] = true;
+
+			// Resizing template vectors to match with currK iteration size.
+			occupationFT_Template.resize(i + 1);
+			costFT_Template.resize(i + 1);
+
+			// Building Occupation Fenwick Trees and Cost Fenwick Trees, one per each machine.
+			vector<FenwickTree> occupationFT(M, FenwickTree(occupationFT_Template));
+			vector<FenwickTree> costFT(M, FenwickTree(costFT_Template));
+
+			// Assignment table starts empty.
+			vector<vector<int>> assignmentTable (M, vector<int> (i + 1, -1));
+			int solutionCost = 0, solutionMakespan = -1;
+
+			for(int j = 0; j < N; j++) {
+
+				int job = sortedJobs[j].second;
+				int currP = sortedJobs[j].first;
+
+				Location bestLocation;
+
+				if(!impossibleToInsert)
+					Fast_FenwickTreeSplitGreedyCH_GetBestFreeLocation(bestLocation, i, currP, assignmentTable, occupationFT, costFT);
+				
+				
+				if(!impossibleToInsert && !FenwickTreeSplitGreedyCH_AssignLocation(assignmentTable, bestLocation, job, solutionCost, occupationFT, costFT)){
+					impossibleToInsert = true;
+				}
+						
+				if(!impossibleToInsert)
+					solutionMakespan = max(solutionMakespan, bestLocation.end);
+			}
+
+			if(!impossibleToInsert && solutionCost > 0) {
+				Solution S = SimpleSplitGreedyCH_ConvertSolution(assignmentTable, i, solutionCost, solutionMakespan);
+				printf("%d, %d\n", solutionCost, solutionMakespan);
+				solutions.insertSol(solutionCost, solutionMakespan, S); 
+			}
+		}
+
+	for(int i = 0; i < K; i++)
+		cout << (visited[i] ? "1" : "0");
+	cout << "\n";
+}
+*/

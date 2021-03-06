@@ -17,9 +17,10 @@ private:
 	int N;
 
 public:
-	Solution(){};
+	Solution(){ N = -1;};
 	Solution(int N_);
 
+	int getN(){ return N; }
 	void setObj(int x, int y);
 	std::pair<int, int> getObj(){ return obj; }
 
