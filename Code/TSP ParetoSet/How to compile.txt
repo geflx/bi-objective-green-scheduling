@@ -1,0 +1,4 @@
+Type "make" and press "Enter"
+Type "./a.out"
+Insert number of nodes in adj. matrix (not counting root).
+Inser number of random solutions to create.
