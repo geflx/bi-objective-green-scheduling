@@ -1,0 +1,7 @@
+ EPS J: conjunto com somente 1 job
+ EPS I: conjunto com no mínimo 1 job e 1 idle slot
+
+ Mp J(S) : associa slot k ao primeiro slot de um E (um EPS) com cardinalidade "p" .
+ 		   quando nao tem, associa a um E vazio.
+
+ Mp I(S) : o mesmo porém para EPS I.
